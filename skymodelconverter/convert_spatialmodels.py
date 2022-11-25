@@ -1,5 +1,6 @@
 from convert_common import ConvertCommon
 from astropy import units as u
+import numpy as np
 import os
 from gammapy.maps import Map
 from gammapy.modeling.models import (
@@ -91,11 +92,19 @@ class ConvertSpatialModel(ConvertCommon):
   def set_DiskSpatialModel(self, parameters):
     paramvalues=self.get_values(parameters)
     self.get_attributes(parameters)  
-    spatialmodel= DiskSpatialModel(
-      lon_0=paramvalues['RA']* u.deg, 
-      lat_0=paramvalues['DEC']* u.deg,
-      r_0=paramvalues['Radius']* u.deg, 
+    if 'RA' in paramvalues: 
+      lon0val=paramvalues['RA']
+      lat0val=paramvalues['DEC']
       frame="icrs"
+    elif 'GLON' in paramvalues:
+      lon0val=paramvalues['GLON']
+      lat0val=paramvalues['GLAT']
+      frame="galactic"
+    spatialmodel= DiskSpatialModel(
+      lon_0=lon0val* u.deg, 
+      lat_0=lat0val* u.deg,
+      r_0=paramvalues['Radius']* u.deg, 
+      frame=frame
     )
     return spatialmodel
   ###########################################
@@ -117,10 +126,18 @@ class ConvertSpatialModel(ConvertCommon):
   def set_PointSpatialModel(self, parameters):
     paramvalues=self.get_values(parameters)
     self.get_attributes(parameters)  
-    spatialmodel= PointSpatialModel(
-      lon_0=paramvalues['RA']* u.deg, 
-      lat_0=paramvalues['DEC']* u.deg,
+    if 'RA' in paramvalues: 
+      lon0val=paramvalues['RA']
+      lat0val=paramvalues['DEC']
       frame="icrs"
+    elif 'GLON' in paramvalues:
+      lon0val=paramvalues['GLON']
+      lat0val=paramvalues['GLAT']
+      frame="galactic"
+    spatialmodel= PointSpatialModel(
+      lon_0=lon0val* u.deg, 
+      lat_0=lat0val* u.deg,
+      frame=frame
     )
     return spatialmodel
   ###########################################
@@ -154,12 +171,20 @@ class ConvertSpatialModel(ConvertCommon):
   def set_ShellSpatialModel(self, parameters):
     paramvalues=self.get_values(parameters)
     self.get_attributes(parameters)  
+    if 'RA' in paramvalues: 
+      lon0val=paramvalues['RA']
+      lat0val=paramvalues['DEC']
+      frame="icrs"
+    elif 'GLON' in paramvalues:
+      lon0val=paramvalues['GLON']
+      lat0val=paramvalues['GLAT']
+      frame="galactic"
     spatialmodel= ShellSpatialModel(
-      lon_0=paramvalues['RA']* u.deg, 
-      lat_0=paramvalues['DEC']* u.deg,
+      lon_0=lon0val* u.deg, 
+      lat_0=lat0val* u.deg,
       radius=paramvalues['Radius']* u.deg,
       width=paramvalues['Width']* u.deg,
-      frame="icrs"
+      frame=frame
     )
     return spatialmodel
   ###########################################
@@ -186,12 +211,20 @@ class ConvertSpatialModel(ConvertCommon):
   def set_GaussianSpatialModel1(self, parameters):
     paramvalues=self.get_values(parameters)
     self.get_attributes(parameters)  
+    if 'RA' in paramvalues: 
+      lon0val=paramvalues['RA']
+      lat0val=paramvalues['DEC']
+      frame="icrs"
+    elif 'GLON' in paramvalues:
+      lon0val=paramvalues['GLON']
+      lat0val=paramvalues['GLAT']
+      frame="galactic"
     spatialmodel= GaussianSpatialModel(
-      lon_0=paramvalues['RA']* u.deg, 
-      lat_0=paramvalues['DEC']* u.deg,
+      lon_0=lon0val* u.deg, 
+      lat_0=lat0val* u.deg,
       sigma=paramvalues['Sigma']* u.deg,
       e=0, phi=0* u.deg,
-      frame="icrs"
+      frame=frame
     )
     return spatialmodel
   ###########################################
@@ -214,12 +247,20 @@ class ConvertSpatialModel(ConvertCommon):
   def set_GaussianSpatialModel2(self, parameters):
     paramvalues=self.get_values(parameters)
     self.get_attributes(parameters)  
+    if 'RA' in paramvalues: 
+      lon0val=paramvalues['RA']
+      lat0val=paramvalues['DEC']
+      frame="icrs"
+    elif 'GLON' in paramvalues:
+      lon0val=paramvalues['GLON']
+      lat0val=paramvalues['GLAT']
+      frame="galactic"
     spatialmodel= GaussianSpatialModel(
-      lon_0=paramvalues['RA']* u.deg, 
-      lat_0=paramvalues['DEC']* u.deg,
+      lon_0=lon0val* u.deg, 
+      lat_0=lat0val* u.deg,
       e= np.sqrt(1 - (paramvalues['MinorRadius']/paramvalues['MajorRadius'])**2),
       phi=paramvalues['PA']* u.deg,
-      frame="icrs"
+      frame=frame
     )
     return spatialmodel
   #
