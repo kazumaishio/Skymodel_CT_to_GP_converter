@@ -314,9 +314,9 @@ class ConvertSpectralModel(ConvertCommon):
     spectralmodel=None
     for ct_spectralmodel in ct_spectralmodels:
       if spectralmodel==None : # the first model
-        spectralmodel=generate_spectralmodel(ct_spectralmodel)
+        spectralmodel=self.generate_spectralmodel(ct_spectralmodel)
       else : # from second on
-        spectralmodel_to_add=generate_spectralmodel(ct_spectralmodel)
+        spectralmodel_to_add=self.generate_spectralmodel(ct_spectralmodel)
         spectralmodel_to_add.amplitude.frozen = True
         spectralmodel=spectralmodel+spectralmodel_to_add
 
