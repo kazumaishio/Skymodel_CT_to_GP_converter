@@ -2,9 +2,9 @@
 This repository provides the conversion of a skymodel file, from a ctool format (xml) file to a gammapy format (yaml) file.
 
 ## Contents of this repository
-- skymodelconverter
+- ```skymodelconverter```
   contains the conversion library.
-- scripts
+- ```scripts```
   contains the example scripts to use the conversion library.
 
 # Usage
@@ -25,6 +25,7 @@ The script writes the gammapy skymodel file(s) in the specified path.
 
 
 
-# Change log
-
+# Change log (of significant revision)
+20230507: introducing README
+20230507: unit change from power of day to power of sec in reading the phaseogram parameters
 20221122: fist commit: test commit 
