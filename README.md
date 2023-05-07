@@ -25,6 +25,6 @@ The script writes the gammapy skymodel file(s) in the specified path.
 
 
 
-#Change log
+# Change log
 
 20221122: fist commit: test commit 
