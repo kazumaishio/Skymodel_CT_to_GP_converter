@@ -1,1 +1,9 @@
-20221122: fist commit: test commit 
+# SkyModelConverter
+
+## Usage
+
+### input files
+
+### script
+
+
