@@ -8,7 +8,7 @@ This repository provides the conversion of a skymodel file, from a ctool format 
   contains the example scripts to use the conversion library.
 
 # Usage
-After downloading this repository, place the input files 
+After downloading this repository, edit and run one of the scripts on your ctool skymodel file(s). 
 
 ## Necessary input files
 - xml skymodel file (for ctool) 
