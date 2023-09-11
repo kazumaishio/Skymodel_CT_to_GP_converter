@@ -35,7 +35,6 @@ class ConvertTemporalModel(ConvertCommon):
   #   PhaseCurve  to  TemplatePhaseCurveTemporalModel
   ########################################### 
   #              -- ctool --         
-  # https://docs.gammapy.org/dev/user-guide/model-gallery/temporal/plot_template_phase_temporal.html#sphx-glr-user-guide-model-gallery-temporal-plot-template-phase-temporal-py
   # http://cta.irap.omp.eu/ctools/users/user_manual/models_temporal.html#phase-curve
   # 𝑀temporal(𝑡)=𝑁0×𝑟(Φ(𝑡))
   # where the phase as function of time is computed using
@@ -59,8 +58,9 @@ class ConvertTemporalModel(ConvertCommon):
     if paramvalues['Normalization']!=1 : 
       print('set_TemplatePhaseCurveTemporalModel: Normalization is NOT 1!!!')
     t_ref =paramvalues['MJD'] * u.d
-    f0=1.0 / (paramvalues['F0'] * u.d)
-    f1=1.0 / (paramvalues['F1'] * u.d**2)
-    f2=1.0 / (paramvalues['F2'] * u.d**3)
-    temporal_model = TemplatePhaseCurveTemporalModel.read(filepath, t_ref, 0.0, f0, f1, f2)
+    phi_ref = paramvalues['Phase']
+    f0=paramvalues['F0'] / (1.0 * u.s)
+    f1=paramvalues['F1'] / (1.0 * u.s**2)
+    f2=paramvalues['F2'] / (1.0 * u.s**3)
+    temporal_model = TemplatePhaseCurveTemporalModel.read(filepath, t_ref, phi_ref, f0, f1, f2)
     return temporal_model
