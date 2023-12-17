@@ -10,6 +10,11 @@ This repository provides the conversion of a skymodel file, from a ctool format 
 # Usage
 After downloading this repository, edit and run one of the scripts on your ctool skymodel file(s). 
 
+## Necessary packages
+- astropy
+- gammapy
+- xmltodict
+
 ## Necessary input files
 - xml skymodel file (for ctool) 
 - external files: the set of files referred from the skymodel file (mostly fits format files)
@@ -17,7 +22,7 @@ After downloading this repository, edit and run one of the scripts on your ctool
 ## Run a script
 1. Determine your preferrable input directory and output directory.
 2. Place the input files in the input directory. 
-3. Open one of the example scripts in the "scripts" directory, and edit input and output paths, and run the script.
+3. Open one of the example scripts in the "scripts" directory of this repository, and edit input and output paths, and run the script.
 
 ## Output files
 The script writes the gammapy skymodel file(s) in the specified path.
