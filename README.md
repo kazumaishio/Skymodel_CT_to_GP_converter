@@ -14,6 +14,9 @@ After downloading this repository, edit and run one of the scripts on your ctool
 - astropy
 - gammapy
 - xmltodict
+  ```
+  conda create --name ctadatachallenge -c conda-forge gammapy xmltodict astropy notebook jupyter nb_conda_kernels 
+  ```
 
 ## Necessary input files
 - xml skymodel file (for ctool) 
