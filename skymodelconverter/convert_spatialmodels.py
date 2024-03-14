@@ -277,14 +277,7 @@ class ConvertSpatialModel(ConvertCommon):
   def set_TemplateSpatialModel1(self, parameters,filepath):
     paramvalues=self.get_values([parameters])
     m = Map.read(filepath) 
-    if paramvalues['Normalization']==1:
-      if paramvalues['Normalization']==1:
-        spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=True)
-      else:
-        print('Normalization is possible only to unity in gammapy. Spatial model generation is skipped.')
-    else:
-      spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=False)    
-
+    spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=True)
     return spatialmodel
 
   #
@@ -302,12 +295,6 @@ class ConvertSpatialModel(ConvertCommon):
   def set_TemplateSpatialModel2(self, parameters,filepath):
     paramvalues=self.get_values([parameters])
     m = Map.read(filepath) 
-    if paramvalues['Normalization']==1:
-      if paramvalues['Normalization']==1:
-        spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=True)
-      else:
-        print('Normalization is possible only to unity in gammapy. Spatial model generation is skipped.')
-    else:
-      spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=False)    
+    spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=False, unit="")    
     
     return spatialmodel

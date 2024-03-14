@@ -14,7 +14,8 @@ from gammapy.modeling.models import (
   SmoothBrokenPowerLawSpectralModel,
   BrokenPowerLawSpectralModel,
   CompoundSpectralModel,
-  ExpCutoffPowerLawNormSpectralModel
+  ExpCutoffPowerLawNormSpectralModel,
+  PowerLawNormSpectralModel
 )
 
 ########################################################
@@ -36,7 +37,7 @@ class ConvertSpectralModel(ConvertCommon):
   dict_spectralmodel['SuperExponentialCutoffPowerLaw']   ="SuperExpCutoffPowerLaw3FGLSpectralModel"
   dict_spectralmodel['Composite']                        ="summation of multiple models"
   dict_spectralmodel['LogParabola']                      ="LogParabolaSpectralModel"
-  dict_spectralmodel['Constant']                         ="ConstantSpectralModel"
+  dict_spectralmodel['Constant']                         ="PowerLawNormSpectralModel"
   dict_spectralmodel['SmoothBrokenPowerLaw']             ="SmoothBrokenPowerLawSpectralModel"
   dict_spectralmodel['BrokenPowerLaw']                   ="BrokenPowerLawSpectralModel"
   dict_spectralmodel['Multiplicative']                   ="CompoundSpectralModel"
@@ -82,7 +83,7 @@ class ConvertSpectralModel(ConvertCommon):
       gp_spectralmodel                          =self.set_LogParabolaSpectralModel(parameters)
     if spectraltype=="Constant":
       parameters = ct_spectralinfo["parameter"]
-      gp_spectralmodel                          =self.set_ConstantSpectralModel(parameters)
+      gp_spectralmodel                          =self.set_PowerLawNormSpectralModel(parameters)
     if spectraltype=="SmoothBrokenPowerLaw":
       parameters = ct_spectralinfo["parameter"]
       gp_spectralmodel                          =self.set_SmoothBrokenPowerLawSpectralModel(parameters)
@@ -149,7 +150,7 @@ class ConvertSpectralModel(ConvertCommon):
     spectralmodel = PowerLawSpectralModel(
       amplitude = paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
       index     = paramvalues['Index']*(-1),
-      refecence = paramvalues['PivotEnergy']*u.Unit("MeV")
+      reference = paramvalues['PivotEnergy']*u.Unit("MeV")
     )
     params_attributes=self.get_attributes(parameters)
     return spectralmodel
@@ -217,7 +218,7 @@ class ConvertSpectralModel(ConvertCommon):
     spectralmodel = ExpCutoffPowerLawSpectralModel(
       amplitude = paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
       index     = paramvalues['Index']*(-1),
-      refecence = paramvalues['PivotEnergy']*u.Unit("MeV"),
+      reference = paramvalues['PivotEnergy']*u.Unit("MeV"),
       lambda_   = 1./(paramvalues['CutoffEnergy']*u.Unit("MeV"))  
     )
     params_attributes=self.get_attributes(parameters)
@@ -251,7 +252,7 @@ class ConvertSpectralModel(ConvertCommon):
     spectralmodel = ExpCutoffPowerLawSpectralModel(
       amplitude = paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
       index     = paramvalues['Index']*(-1),
-      refecence = paramvalues['Scale']*u.Unit("MeV"),
+      reference = paramvalues['Scale']*u.Unit("MeV"),
       lambda_   = 1./(paramvalues['Cutoff']*u.Unit("MeV"))  
     )
     params_attributes=self.get_attributes(parameters)
@@ -349,7 +350,31 @@ class ConvertSpectralModel(ConvertCommon):
     return spectralmodel
 
   ###########################################
+  #   Constant  to  PowerLawNormSpectralModel
+  ########################################### 
+  # http://cta.irap.omp.eu/ctools/users/user_manual/models_spectral.html
+  # NOTE: only one parameter
+  # -> 
+  # https://docs.gammapy.org/1.2/api/gammapy.modeling.models.PowerLawNormSpectralModel.html?highlight=powerlawnorm
+  # - ctools definition -                                     -- gammapy --  
+  # Mspectral(E)=N0
+  # where
+  # N0 = Normalization (phcm−2s−1MeV−1)                   = norm   (no unit)
+  def set_PowerLawNormSpectralModel(self,parameters):
+    # print(parameters)
+    # NOTE: Only one parameter, thus parameters casted as []
+    paramvalues=self.get_values([parameters])    
+    self.get_attributes([parameters])  
+    spectralmodel = PowerLawNormSpectralModel(
+      norm = paramvalues['Normalization']
+    )
+    return spectralmodel
+
+
+
+  ###########################################
   #   Constant  to  ConstantSpectralModel
+  #  (dismantled on 20240313, due to crash in gammapy)
   ########################################### 
   # http://cta.irap.omp.eu/ctools/users/user_manual/models_spectral.html
   # NOTE: only one parameter
@@ -488,7 +513,7 @@ class ConvertSpectralModel(ConvertCommon):
     spectralmodel = ExpCutoffPowerLawNormSpectralModel(
       # amplitude = 1, #* u.Unit("cm-2 s-1 MeV-1"), #paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
       index     = 0, 
-      refecence = 1,
+      reference = 1*u.Unit("TeV"),
       lambda_   = 1./(paramvalues['PivotEnergy']*u.Unit("MeV")),
       alpha = paramvalues['Index']*(-1),
     )
