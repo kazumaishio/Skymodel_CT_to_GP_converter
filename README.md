@@ -32,8 +32,8 @@ After downloading this repository, edit and run one of the scripts on your ctool
 The script writes the gammapy skymodel file(s) in the specified path.
 
 # Change log (of significant revision)
-20240314: bugfix for (1) wrong pivot energy in some spectral models, (2) problematic conversion from DiffuseMapCube
-20240314: phasecurvecorrector
-20230507: introducing README
-20230507: unit change from power of day to power of sec in reading the phaseogram parameters
-20221122: fist commit: test commit 
+- 20240314: bugfix for (1) wrong pivot energy in some spectral models, (2) problematic conversion from DiffuseMapCube
+- 20240314: phasecurvecorrector
+- 20230507: introducing README
+- 20230507: unit change from power of day to power of sec in reading the phaseogram parameters
+- 20221122: fist commit: test commit 
