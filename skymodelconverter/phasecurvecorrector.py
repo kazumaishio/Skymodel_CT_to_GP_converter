@@ -86,17 +86,27 @@ import glob
 
 def main():
   args=sys.argv
-  print('hello')
   print(os.getcwd())
 
   modelfiledir="/Users/kazuma/Workspace/CTA/20221012_NewSkymdlChk/12_Software to assemble Galactic models/gps-luigitibaldo/skymodel/output/"
   
   # phasefiledir="../testdata2" 
-  if  1 < len(args):
+  if 2 < len(args):
+    modelfiledir=args[2]
+    phasefiledir=args[1]
+  elif  1 < len(args):
     phasefiledir=args[1]
   else :
+    print('usage: python phasecurvecorrector.py path_to_phasecurve_files_directory directory_path_to_gps_xml')
+    print('NOTE: ps xml file is named "models_gps.xml"')
+    print("If you don't specify the argument, this runs with the default.")
+    print("xml files directory : {}".format(modelfiledir))
+    print("phasecurve files directory : {}".format(modelfiledir))
     phasefiledir=modelfiledir
-  print(phasefiledir)
+  
+  print("The phasecurve fits files will be corrected.")
+  print("Search directory for models_gps.xml  : {}".format(modelfiledir))  
+  print("Search directory for phase fits files: {}".format(phasefiledir))
 
   targetfileformat='phasecurve*'
   backupfileformat='phasecurve*_bk*'
