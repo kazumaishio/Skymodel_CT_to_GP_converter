@@ -21,6 +21,7 @@ After downloading this repository, edit and run one of the scripts on your ctool
 ## Necessary input files
 - xml skymodel file (for ctool) 
 - external files: the set of files referred from the skymodel file (mostly fits format files)
+### NOTE: phasecurve files in gps need correction. Use phasecurvecorrector.py!
 
 ## Run a script
 1. Determine your preferrable input directory and output directory.
@@ -30,10 +31,9 @@ After downloading this repository, edit and run one of the scripts on your ctool
 ## Output files
 The script writes the gammapy skymodel file(s) in the specified path.
 
-
-
-
 # Change log (of significant revision)
-20230507: introducing README
-20230507: unit change from power of day to power of sec in reading the phaseogram parameters
-20221122: fist commit: test commit 
+- 20240314: bugfix for (1) wrong pivot energy in some spectral models, (2) problematic conversion from DiffuseMapCube
+- 20240314: phasecurvecorrector
+- 20230507: introducing README
+- 20230507: unit change from power of day to power of sec in reading the phaseogram parameters
+- 20221122: fist commit: test commit 
