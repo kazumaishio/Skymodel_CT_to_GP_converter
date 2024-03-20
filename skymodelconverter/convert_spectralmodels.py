@@ -344,7 +344,7 @@ class ConvertSpectralModel(ConvertCommon):
     spectralmodel = LogParabolaSpectralModel(
       amplitude = paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
       alpha = paramvalues['Index']*(-1),
-      beta = paramvalues['Curvature'],
+      beta = paramvalues['Curvature']*(-1),
       reference = paramvalues['PivotEnergy']*u.Unit("MeV"),
     )
     return spectralmodel
@@ -507,15 +507,13 @@ class ConvertSpectralModel(ConvertCommon):
   # https://docs.gammapy.org/0.19/modeling/gallery/spectral/plot_exp_cutoff_powerlaw.html#sphx-glr-modeling-gallery-spectral-plot-exp-cutoff-powerlaw-py
   # https://docs.gammapy.org/0.19/api/gammapy.modeling.models.ExpCutoffPowerLawSpectralModel.html#gammapy.modeling.models.ExpCutoffPowerLawSpectralModel
   def set_ExpCutoffPowerLawNormSpectralModel(self,parameters) : 
-    # print(parameters)
     paramvalues=self.get_values(parameters)
-    # get_attributes(parameters)  
     spectralmodel = ExpCutoffPowerLawNormSpectralModel(
       # amplitude = 1, #* u.Unit("cm-2 s-1 MeV-1"), #paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
-      index     = 0, 
-      reference = 1*u.Unit("TeV"),
-      lambda_   = 1./(paramvalues['PivotEnergy']*u.Unit("MeV")),
-      alpha = paramvalues['Index']*(-1),
+      index     = paramvalues['Index']*(-1), 
+      reference = paramvalues['PivotEnergy']*u.Unit("MeV"),
+      lambda_   = 1./(paramvalues['CutoffEnergy']*u.Unit("MeV")),
+      alpha = 1
     )
     params_attributes=self.get_attributes(parameters)
     if 'Index' in params_attributes['@min']:
