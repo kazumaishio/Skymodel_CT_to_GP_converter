@@ -476,10 +476,12 @@ class ConvertSpectralModel(ConvertCommon):
         spectralmodel=self.generate_spectralmodel(ct_spectralmodel)
       else :
         print('in compound: next spectrum')
+        # Cutoff should be the last one in the compund. 
+        # Based on their special treatments, "Norm" function is used in two ways.
         if ct_spectralmodel['@type']=="ExponentialCutoffPowerLaw" : 
           print('ExpCutoffPowerLaw')
           parameters = ct_spectralmodel["parameter"]
-          spectralmodel_to_multiply=self.set_ExpCutoffPowerLawNormSpectralModel(parameters)
+          spectralmodel_to_multiply=self.set_ExpCutoffPowerLawNormSpectralModel_1(parameters)
           spectralmodel_to_multiply.norm.frozen = True        
           spectralmodel=spectralmodel*spectralmodel_to_multiply          
         if ct_spectralmodel['@type']=="Exponential" :
@@ -488,14 +490,14 @@ class ConvertSpectralModel(ConvertCommon):
           innerspectraltype = innerspectralinfo["@type"]
           if innerspectraltype =="PowerLaw" : 
             parameters = innerspectralinfo["parameter"]
-            spectralmodel_to_multiply=self.set_ExpCutoffPowerLawNormSpectralModel(parameters)
+            spectralmodel_to_multiply=self.set_ExpCutoffPowerLawNormSpectralModel_2(parameters)
             spectralmodel_to_multiply.norm.frozen = True
             spectralmodel=spectralmodel*spectralmodel_to_multiply            
     return spectralmodel #* ConstantSpectralModel(const=1*u.Unit("cm2 s MeV"))
 
 
   ###########################################
-  #   Exponential  to  ExpCutoffPowerLawNormSpectralModel
+  #   ExpCutoffPowerLaw (in Multiplicative) to  ExpCutoffPowerLawNormSpectralModel
   ########################################### 
   # http://cta.irap.omp.eu/ctools/users/user_manual/models_spectral.html#exponential-model
   # - ctools definition -               
@@ -506,19 +508,45 @@ class ConvertSpectralModel(ConvertCommon):
   # -> 
   # https://docs.gammapy.org/0.19/modeling/gallery/spectral/plot_exp_cutoff_powerlaw.html#sphx-glr-modeling-gallery-spectral-plot-exp-cutoff-powerlaw-py
   # https://docs.gammapy.org/0.19/api/gammapy.modeling.models.ExpCutoffPowerLawSpectralModel.html#gammapy.modeling.models.ExpCutoffPowerLawSpectralModel
-  def set_ExpCutoffPowerLawNormSpectralModel(self,parameters) : 
+  #        pwl = norm * (energy / reference) ** (-index)
+  #        cutoff = np.exp(-np.power(energy * lambda_, alpha))
+  #        return pwl * cutoff
+  # by lambda_ = 1/CutoffEnergy and alpha = 1, cutoff = exp(-E/Ecut)    
+  def set_ExpCutoffPowerLawNormSpectralModel_1(self,parameters) : 
     paramvalues=self.get_values(parameters)
     spectralmodel = ExpCutoffPowerLawNormSpectralModel(
-      # amplitude = 1, #* u.Unit("cm-2 s-1 MeV-1"), #paramvalues['Prefactor']* u.Unit("cm-2 s-1 MeV-1"),
       index     = paramvalues['Index']*(-1), 
       reference = paramvalues['PivotEnergy']*u.Unit("MeV"),
       lambda_   = 1./(paramvalues['CutoffEnergy']*u.Unit("MeV")),
       alpha = 1
     )
-    params_attributes=self.get_attributes(parameters)
-    if 'Index' in params_attributes['@min']:
-      spectralmodel.index.min=float(params_attributes['@min']['Index'])*(-1)*float(params_attributes['@scale']['Index'])
-    if 'Index' in params_attributes['@max']:
-      spectralmodel.index.max=float(params_attributes['@max']['Index'])*(-1)*float(params_attributes['@scale']['Index'])
 
     return spectralmodel
+  
+  ###########################################
+  #   Exponential (in Multiplicative) to  ExpCutoffPowerLawNormSpectralModel
+  ########################################### 
+  # http://cta.irap.omp.eu/ctools/users/user_manual/models_spectral.html#exponential-model
+  # - ctools definition -               
+  # 𝑀spectral(𝐸)=exp(𝛼𝑀spectral(𝐸))
+  # where
+  # 𝑀spectral(𝐸) is any spectral model component
+  # 𝛼 = Normalization
+  # -> 
+  # https://docs.gammapy.org/0.19/modeling/gallery/spectral/plot_exp_cutoff_powerlaw.html#sphx-glr-modeling-gallery-spectral-plot-exp-cutoff-powerlaw-py
+  # https://docs.gammapy.org/0.19/api/gammapy.modeling.models.ExpCutoffPowerLawSpectralModel.html#gammapy.modeling.models.ExpCutoffPowerLawSpectralModel
+  #        pwl = norm * (energy / reference) ** (-index)
+  #        cutoff = np.exp(-np.power(energy * lambda_, alpha))
+  #        return pwl * cutoff
+  # by norm = 1 and index=0, pwl=1
+  # by lambda_ = 1/PivotEnergy and alpha = 1, cutoff = exp(-E/Ecut)
+  def set_ExpCutoffPowerLawNormSpectralModel_2(self,parameters) : 
+    paramvalues=self.get_values(parameters)
+    spectralmodel = ExpCutoffPowerLawNormSpectralModel(
+      index     = 0, 
+      reference = 1*u.Unit("TeV"), # dummy
+      lambda_   = 1./(paramvalues['PivotEnergy']*u.Unit("MeV")),
+      alpha = 1
+    )
+
+    return spectralmodel  
