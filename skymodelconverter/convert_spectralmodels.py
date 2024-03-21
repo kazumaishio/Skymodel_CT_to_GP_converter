@@ -525,6 +525,7 @@ class ConvertSpectralModel(ConvertCommon):
   
   ###########################################
   #   Exponential (in Multiplicative) to  ExpCutoffPowerLawNormSpectralModel
+  #   (PowerLaw wrapped by Exponential)
   ########################################### 
   # http://cta.irap.omp.eu/ctools/users/user_manual/models_spectral.html#exponential-model
   # - ctools definition -               
@@ -532,6 +533,12 @@ class ConvertSpectralModel(ConvertCommon):
   # where
   # 𝑀spectral(𝐸) is any spectral model component
   # 𝛼 = Normalization
+  # Inside the Exponential: PowerLaw
+  # Mspectral(E)=k0(E/E0)^γ   
+  # where                                  
+  # k0  = Prefactor (phcm−2s−1MeV−1)    (should be 1 in xml)         
+  # γ = Index                           (should be 1 in xml)         
+  # E0 = PivotEnergy (MeV)                                 
   # -> 
   # https://docs.gammapy.org/0.19/modeling/gallery/spectral/plot_exp_cutoff_powerlaw.html#sphx-glr-modeling-gallery-spectral-plot-exp-cutoff-powerlaw-py
   # https://docs.gammapy.org/0.19/api/gammapy.modeling.models.ExpCutoffPowerLawSpectralModel.html#gammapy.modeling.models.ExpCutoffPowerLawSpectralModel
@@ -542,6 +549,10 @@ class ConvertSpectralModel(ConvertCommon):
   # by lambda_ = 1/PivotEnergy and alpha = 1, cutoff = exp(-E/Ecut)
   def set_ExpCutoffPowerLawNormSpectralModel_2(self,parameters) : 
     paramvalues=self.get_values(parameters)
+    if paramvalues['Index'] !=1 :
+      print("Problem: Index of PowerLaw in Exponential is not 1, but {}".format(paramvalues['Index']))
+    if paramvalues['Prefactor'] !=1 :
+      print("Problem: Prefactor of PowerLaw in Exponential is not 1, but {}".format(paramvalues['Index']))
     spectralmodel = ExpCutoffPowerLawNormSpectralModel(
       index     = 0, 
       reference = 1*u.Unit("TeV"), # dummy
