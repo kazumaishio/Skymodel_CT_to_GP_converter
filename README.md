@@ -11,11 +11,20 @@ This repository provides the conversion of a skymodel file, from a ctool format 
 After downloading this repository, edit and run one of the scripts on your ctool skymodel file(s). 
 
 ## Necessary packages
-- astropy
-- gammapy
-- xmltodict
+- For gammalib 2.0
+  - python 3.11 (>=3.12 does not work for gammalib2.0 because of the use of the obsolete 'imp' package)
+  - gammapy (latest = 2.0)
+  - gammalib 2.0 ( follow the compilation installation, including cfitsio)
+  - xmltodict (installation possible via pip, not via conda)
+
+### you can create the dedicated conda environment for avoiding package confliction as follows;
   ```
-  conda create --name ctadatachallenge -c conda-forge gammapy xmltodict astropy notebook jupyter nb_conda_kernels 
+  conda create --name ctadatachallenge 
+  conda activate ctadatachallenge 
+  conda install -c conda-forge gammapy
+  (installation process for cfitsio)
+  (installation process for gammalib)
+  pip install xmltodict
   ```
 
 ## Necessary input files
@@ -32,6 +41,7 @@ After downloading this repository, edit and run one of the scripts on your ctool
 The script writes the gammapy skymodel file(s) in the specified path.
 
 # Change log (of significant revision)
+- 20260105: adjustment to the gammapy 2.0, including the update of NodeFunction conversion.
 - 20240314: bugfix for (1) wrong pivot energy in some spectral models, (2) problematic conversion from DiffuseMapCube
 - 20240314: phasecurvecorrector
 - 20230507: introducing README

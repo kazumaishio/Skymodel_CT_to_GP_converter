@@ -62,5 +62,5 @@ class ConvertTemporalModel(ConvertCommon):
     f0=paramvalues['F0'] / (1.0 * u.s)
     f1=paramvalues['F1'] / (1.0 * u.s**2)
     f2=paramvalues['F2'] / (1.0 * u.s**3)
-    temporal_model = TemplatePhaseCurveTemporalModel.read(filepath, t_ref, phi_ref, f0, f1, f2)
+    temporal_model = TemplatePhaseCurveTemporalModel.read(filepath, True, t_ref, phi_ref, f0, f1, f2) # normalize=True
     return temporal_model

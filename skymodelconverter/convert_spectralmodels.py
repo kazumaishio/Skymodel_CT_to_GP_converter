@@ -2,6 +2,7 @@
 from astropy import units as u
 import numpy as np
 import os
+import gammalib
 from convert_common import ConvertCommon
 from gammapy.modeling.models import (
   PowerLawSpectralModel,
@@ -31,7 +32,7 @@ class ConvertSpectralModel(ConvertCommon):
   #              -- ctool --                                   --  gammapy --
   dict_spectralmodel['FileFunction']                     ="TemplateSpectralModel"
   dict_spectralmodel['PowerLaw']                         ="PowerLawSpectralModel"
-  dict_spectralmodel['NodeFunction']                     ="PiecewiseNormSpectralModel * ConstantSpectralModel"
+  dict_spectralmodel['NodeFunction']                     ="TemplateSpectralModel"
   dict_spectralmodel['ExponentialCutoffPowerLaw']        ="ExpCutoffPowerLawSpectralModel"
   dict_spectralmodel['ExpCutoff']                        ="ExpCutoffPowerLawSpectralModel"
   dict_spectralmodel['SuperExponentialCutoffPowerLaw']   ="SuperExpCutoffPowerLaw3FGLSpectralModel"
@@ -43,10 +44,13 @@ class ConvertSpectralModel(ConvertCommon):
   dict_spectralmodel['Multiplicative']                   ="CompoundSpectralModel"
   dict_spectralmodel['Exponential']                      ="ExpCutoffPowerLawNormSpectralModel"
 
+  def  __init__(self, modelfiledir,modelxmlfilepath="./models_gps.xml"):
+      self.modelfiledir = modelfiledir
+      self.GLmodels = gammalib.GModels(modelxmlfilepath)
   ###########################################
   # Spectral model conversion functions
   ###########################################
-  def generate_spectralmodel(self,ct_spectralinfo):
+  def generate_spectralmodel(self,ct_spectralinfo,sourcename):
     spectraltype=ct_spectralinfo["@type"]
     # print('__________  paraeters in ctools format _______________________________')
     # print("Spectral type: ", ct_spectralinfo["@type"], "with ", len(ct_spectral_parameters), "parameters")
@@ -60,13 +64,13 @@ class ConvertSpectralModel(ConvertCommon):
       parameters = ct_spectralinfo["parameter"]
       filename=ct_spectralinfo["@file"]
       filepath=os.path.join(self.modelfiledir, filename)
-      gp_spectralmodel                          =self.set_TemplateSpectralModel(parameters,filepath)  
+      gp_spectralmodel                          =self.set_TemplateSpectralModel1(parameters,filepath)  
     if spectraltype=="PowerLaw":
       parameters = ct_spectralinfo["parameter"]
       gp_spectralmodel                          =self.set_PowerLawSpectralModel(parameters)
     if spectraltype=="NodeFunction":
-      nodes= ct_spectralinfo["node"]
-      gp_spectralmodel                          =self.set_PiecewiseNormSpectralModel(nodes)
+      # nodes= ct_spectralinfo["node"]
+      gp_spectralmodel                          =self.set_TemplateSpectralModel2(sourcename)
     if spectraltype=="ExponentialCutoffPowerLaw":
       parameters = ct_spectralinfo["parameter"]
       gp_spectralmodel                          =self.set_ExpCutoffPowerLawSpectralModel_1(parameters)
@@ -77,7 +81,7 @@ class ConvertSpectralModel(ConvertCommon):
       parameters = ct_spectralinfo["parameter"]
       gp_spectralmodel                          =self.set_SuperExpCutoffPowerLaw3FGLSpectralModel(parameters)
     if spectraltype=="Composite" :
-      gp_spectralmodel                          =self.set_sum_of_multiple_models(ct_spectralinfo)
+      gp_spectralmodel                          =self.set_sum_of_multiple_models(ct_spectralinfo,sourcename)
     if spectraltype=="LogParabola":
       parameters = ct_spectralinfo["parameter"]
       gp_spectralmodel                          =self.set_LogParabolaSpectralModel(parameters)
@@ -91,7 +95,7 @@ class ConvertSpectralModel(ConvertCommon):
       parameters = ct_spectralinfo["parameter"]
       gp_spectralmodel                          =self.set_BrokenPowerLawSpectralModel(parameters)
     if spectraltype=="Multiplicative":
-      gp_spectralmodel                          =self.set_CompoundSpectralModel(ct_spectralinfo)
+      gp_spectralmodel                          =self.set_CompoundSpectralModel(ct_spectralinfo,sourcename)
                     
     # gp_spectralmodel                          =self.set_DefaultSpectalModel(parameters)
     return gp_spectralmodel
@@ -121,7 +125,7 @@ class ConvertSpectralModel(ConvertCommon):
   # Mspectral(E)=N0dNdE∣∣∣file
   # where
   # N0 = Normalization
-  def set_TemplateSpectralModel(self,parameters, filepath) :
+  def set_TemplateSpectralModel1(self,parameters, filepath) :
     data = np.loadtxt(filepath,skiprows=1)  
     paramvalues=self.get_values([parameters])
     energies=data[:,0]*u.MeV
@@ -195,6 +199,33 @@ class ConvertSpectralModel(ConvertCommon):
       energy=energies, norms=fluxes
     )
     spectralmodel = spectralmodel * ConstantSpectralModel(const="1 / (cm2 s MeV)")
+    return spectralmodel
+  
+  ###########################################
+  #   NodeFunction  to  TemplateSpectralModel
+  ########################################### 
+  # http://cta.irap.omp.eu/ctools/users/user_manual/models_spectral.html#node-function
+  # - ctools definition -                    
+  # This spectral model component implements a generalised broken power law
+  #  which is defined by a set of energy and intensity values (the so called nodes) 
+  #  that are piecewise connected by power laws. Energies are given in units of MeV, 
+  #  intensities are given in units of phcm−2s−1MeV−1.
+  # -> 
+  # -- gammapy --  
+  # --- TemplateSpectralModel --- 
+  # https://docs.gammapy.org/dev/api/gammapy.modeling.models.TemplateSpectralModel.html
+  def set_TemplateSpectralModel2(self,sourcename) :
+    model = self.GLmodels[sourcename]
+    spec = model.spectral()
+    energies = np.logspace(4,9,31) # MeV
+    fluxes = np.array([])
+    # fluxes are read in native Gammalib units: ph/cm2/s/MeV
+    for ee in energies:
+        flux = spec.eval(gammalib.GEnergy(ee,'MeV'))
+        fluxes = np.append(fluxes,flux)
+    spectralmodel= TemplateSpectralModel(
+      energy=energies*u.Unit("MeV"), values=fluxes*u.Unit("cm-2 s-1 MeV-1")
+    )
     return spectralmodel
 
   ###########################################
@@ -310,14 +341,14 @@ class ConvertSpectralModel(ConvertCommon):
   #   -- gammapy --  
   #  
 
-  def set_sum_of_multiple_models(self,ct_spectralinfo) :
+  def set_sum_of_multiple_models(self,ct_spectralinfo,sourcename) :
     ct_spectralmodels=ct_spectralinfo["spectrum"]
     spectralmodel=None
     for ct_spectralmodel in ct_spectralmodels:
       if spectralmodel==None : # the first model
-        spectralmodel=self.generate_spectralmodel(ct_spectralmodel)
+        spectralmodel=self.generate_spectralmodel(ct_spectralmodel,sourcename)
       else : # from second on
-        spectralmodel_to_add=self.generate_spectralmodel(ct_spectralmodel)
+        spectralmodel_to_add=self.generate_spectralmodel(ct_spectralmodel,sourcename)
         spectralmodel_to_add.amplitude.frozen = True
         spectralmodel=spectralmodel+spectralmodel_to_add
 
@@ -467,13 +498,13 @@ class ConvertSpectralModel(ConvertCommon):
   #   -- gammapy --  
   #  https://docs.gammapy.org/dev/user-guide/model-gallery/spectral/plot_absorbed.html?highlight=ebl_dominguez11%20fits%20gz#ebl-absorbption-spectral-model
 
-  def set_CompoundSpectralModel(self,ct_spectralinfo) :
+  def set_CompoundSpectralModel(self,ct_spectralinfo,sourcename) :
     ct_spectralmodels=ct_spectralinfo["spectrum"]
     spectralmodel=None
     for ct_spectralmodel in ct_spectralmodels:
       if spectralmodel==None :
         print('in compound: first spectrum')
-        spectralmodel=self.generate_spectralmodel(ct_spectralmodel)
+        spectralmodel=self.generate_spectralmodel(ct_spectralmodel,sourcename)
       else :
         print('in compound: next spectrum')
         # Cutoff should be the last one in the compund. 

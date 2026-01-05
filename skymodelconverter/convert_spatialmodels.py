@@ -295,6 +295,7 @@ class ConvertSpatialModel(ConvertCommon):
   def set_TemplateSpatialModel2(self, parameters,filepath):
     paramvalues=self.get_values([parameters])
     m = Map.read(filepath) 
-    spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=False, unit="")    
+    # spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=False, unit="")    
+    spatialmodel= TemplateSpatialModel(m, filename=filepath, normalize=False)    
     
     return spatialmodel
