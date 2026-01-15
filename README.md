@@ -42,6 +42,10 @@ The script writes the gammapy skymodel file(s) in the specified path.
 
 # Change log (of significant revision)
 - 20260105: adjustment to the gammapy 2.0, including the update of NodeFunction conversion.
+  - gammapy version: 2.0.1
+  - gammalib version: 2.0.0
+  - python version 3.11.14
+  - cfitsio version 4.5.0
 - 20240314: bugfix for (1) wrong pivot energy in some spectral models, (2) problematic conversion from DiffuseMapCube
 - 20240314: phasecurvecorrector
 - 20230507: introducing README
