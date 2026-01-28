@@ -51,6 +51,9 @@ class ConvertSpectralModel(ConvertCommon):
   # Spectral model conversion functions
   ###########################################
   def generate_spectralmodel(self,ct_spectralinfo,sourcename):
+    if(self.is_source_to_be_removed(sourcename)):
+      print("@ generate_spectralmodel: Source ", sourcename, " is set to be removed. So, no spectral model is generated.")
+      return None 
     spectraltype=ct_spectralinfo["@type"]
     # print('__________  paraeters in ctools format _______________________________')
     # print("Spectral type: ", ct_spectralinfo["@type"], "with ", len(ct_spectral_parameters), "parameters")

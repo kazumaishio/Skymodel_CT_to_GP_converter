@@ -31,6 +31,19 @@ class ConvertCommon:
           params_attributes[key][parameter['@name']]=parameter[key]
     return params_attributes
 
+  def is_source_to_be_removed(self,sourcename):
+    # removablesourceslist=[
+    #   "CRAB"]
+    # for removable in removablesourceslist:
+    #   if removable in sourcename:
+    #     return True
+    
+    #The sourcename starting with "PSR_" will be removed
+    if sourcename.startswith("PSR_"):
+      return True
+    return False
+
+
   # def get_values(parameters):
   #   paramvalues={}
   #   for parameter in parameters :    
