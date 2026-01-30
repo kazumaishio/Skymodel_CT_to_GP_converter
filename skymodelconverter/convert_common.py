@@ -32,12 +32,32 @@ class ConvertCommon:
     return params_attributes
 
   def is_source_to_be_removed(self,sourcename):
-    # removablesourceslist=[
-    #   "CRAB"]
-    # for removable in removablesourceslist:
-    #   if removable in sourcename:
-    #     return True
-    
+
+    #     These models were superseded by some of the new models below and should be removed
+    # SS 433e
+    # SS 433w
+    # SS 433c
+    # LS I 61+303
+    # PSR B1259-63
+    # gemingahalo
+    # 3HWC J2005+311
+    # psrb0656+14halo
+    # PSR_* (All sources in the internal DC model whose name starts with PSR_, with underscore)
+
+    removablesourceslist=[
+      "SS 433e",
+      "SS 433w",
+      "SS 433c",
+      "LS I 61+303",
+      "PSR B1259-63",
+      "gemingahalo",
+      "3HWC J2005+311",
+      "psrb0656+14halo"
+      ]
+    for removable in removablesourceslist:
+      if removable in sourcename:
+        return True
+
     #The sourcename starting with "PSR_" will be removed
     if sourcename.startswith("PSR_"):
       return True
